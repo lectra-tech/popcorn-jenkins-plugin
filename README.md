@@ -33,7 +33,16 @@ If you want to change the `major` or `minor` version you have to change it manua
 
 ## Release
 
-Just merge into `release` branch to launch a Github Actions pipelines that will:
+In order to fire a release, MAINTAINERS have to update `release` branch onto the commit they want, normally `main`.
+
+```
+git checkout release
+git fetch origin main
+git merge -ff-only origin/main
+git push origin release
+```
+
+By doing so, a Github Actions pipeline will be fired and will:
 - remove the SNAPSHOT version of the project
 - tag the git repository with the new fixed version
 - build and test/verify the project
