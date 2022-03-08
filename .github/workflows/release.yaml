@@ -1,0 +1,68 @@
+name: Release build
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Scm
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: 'Set new version for release'
+        run: mvn build-helper:parse-version versions:set -D"newVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}" versions:commit
+
+      - name: 'Extract computed version'
+        run: echo "::set-output name=PROJECT_VERSION::$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | grep '^[0-9]\+\.')"
+        id: extract-version
+
+      - name: 'Build new version'
+        run: mvn -Prelease package
+
+      - name: 'Tag release'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Action Release"
+          git add pom.xml
+          git commit -m "build(skip): release v${{ steps.extract-version.outputs.PROJECT_VERSION }}"
+          git tag v${{ steps.extract-version.outputs.PROJECT_VERSION }} -m "[ci skip] tagging release ${{ steps.extract-version.outputs.PROJECT_VERSION }}"
+          git push origin v${{ steps.extract-version.outputs.PROJECT_VERSION }}
+
+      - name: 'Deploy with JReleaser'
+        env:
+          JRELEASER_BRANCH: release
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B -Prelease jreleaser:full-release
+
+      - name: 'Prepare next development iteration'
+        run: |
+          git reset --hard HEAD~1
+          mvn build-helper:parse-version versions:set -D"newVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}-SNAPSHOT" versions:commit
+          git add pom.xml
+          git commit -m "build(skip): prepare next development version"
+
+      - name: 'Publishes and synchronize branches'
+        run: |
+          git clean -f -d
+          git fetch origin main
+          git checkout main
+          git merge release
+          git push origin main

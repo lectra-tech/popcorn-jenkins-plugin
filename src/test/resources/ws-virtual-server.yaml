@@ -1,0 +1,15 @@
+jenkins:
+  nodes:
+    - permanent:
+        labelString: "admin-jnlp-unlocked"
+        launcher:
+          jnlp:
+            tunnel: "virtual-server:30531"
+            workDirSettings:
+              disabled: true
+              failIfWorkDirIsMissing: false
+              internalDir: "remoting"
+        mode: EXCLUSIVE
+        name: "virtual-server"
+        numExecutors: 1
+        remoteFS: "C:\\CI"

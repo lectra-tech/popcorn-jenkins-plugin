@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# check files formatting
+mvn fmt:check > /dev/null 2>&1
+mvnExitCode=$?
+
+if [ $mvnExitCode -ne 0 ]; then
+  echo -e "\e[31mFormatting is not respected, launch 'mvn fmt:format'"
+fi
+
+exit $mvnExitCode

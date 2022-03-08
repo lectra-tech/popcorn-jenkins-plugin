@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright © 2022 LECTRA (rd.opensource@lectra.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>4.29</version>
+        <relativePath></relativePath>
+    </parent>
+
+    <!-- The Basics -->
+    <groupId>io.jenkins.plugins</groupId>
+    <artifactId>lectra-popcorn</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>hpi</packaging>
+
+    <!-- More Project Information -->
+    <name>Lectra Popcorn Plugin</name>
+    <description>This plugin allows integration of Popcorn</description>
+    <inceptionYear>2022</inceptionYear>
+
+    <organization>
+        <name>LECTRA</name>
+        <url>https://www.lectra.com</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache-2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>lectra-RD</id>
+            <name>Lectra-tech</name>
+            <email>rd.opensource@lectra.com</email>
+        </developer>
+    </developers>
+
+    <!-- Environment Settings -->
+    <scm>
+        <connection>scm:git:git@github.com:lectra-tech/popcorn-jenkins-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:lectra-tech/popcorn-jenkins-plugin.git</developerConnection>
+        <url>https://github.com/lectra-tech/popcorn-jenkins-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
+        <jenkins.version>2.303</jenkins.version>
+        <java.level>8</java.level>
+        <jenkins-test-harness.version>1698.vc58b_4e102e41</jenkins-test-harness.version>
+        <!-- Other properties you may want to use:
+              ~ jenkins-test-harness.version: Jenkins Test Harness version you use to test the plugin. For Jenkins version >= 1.580.1 use JTH 2.0 or higher.
+              ~ hpi-plugin.version: The HPI Maven Plugin version used by the plugin..
+              ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
+             -->
+        <!-- dependencies -->
+        <cloudbees.folder.version>6.7</cloudbees.folder.version>
+        <configuration.as.code.version>1.35</configuration.as.code.version>
+        <httpcore.version>4.4.14</httpcore.version>
+
+        <!-- plugins -->
+        <license-maven-plugin.version>4.1</license-maven-plugin.version>
+        <mockito-core.version>3.12.4</mockito-core.version>
+        <restrict-imports-enforcer-rule.version>2.0.0</restrict-imports-enforcer-rule.version>
+        <fmt-maven-plugin.version>2.13</fmt-maven-plugin.version>
+        <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- Pick up common dependencies for 2.303.x: https://github.com/jenkinsci/bom#usage -->
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-2.303.x</artifactId>
+                <version>1026.vbc102a67c602</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>structs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>cloudbees-folder</artifactId>
+            <version>${cloudbees.folder.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jenkins</groupId>
+            <artifactId>configuration-as-code</artifactId>
+            <version>${configuration.as.code.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-basic-steps</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-durable-task-step</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${httpcore.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>jenkins-ci.org.releases</id>
+            <name>jenkins-ci.org.releases</name>
+            <url>https://repo.jenkins-ci.org/releases/</url>
+        </repository>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </repository>
+        <repository>
+            <id>jenkins-ci.org.incrementals</id>
+            <name>jenkins-ci.org.incrementals</name>
+            <url>https://repo.jenkins-ci.org/incrementals/</url>
+        </repository>
+        <repository>
+            <id>repo.spring.io.plugins-release</id>
+            <name>repo.spring.io.plugins-release</name>
+            <url>https://repo.spring.io/plugins-release/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <!-- Build Settings -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.coveo</groupId>
+                <artifactId>fmt-maven-plugin</artifactId>
+                <version>${fmt-maven-plugin.version}</version>
+                <configuration>
+                    <style>google</style>
+                    <displayFiles>true</displayFiles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>de.skuzzle.enforcer</groupId>
+                        <artifactId>restrict-imports-enforcer-rule</artifactId>
+                        <version>${restrict-imports-enforcer-rule.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>[1.8.0,12.0.0)</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-package-dependencies</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <RestrictImports>
+                                    <groups>
+                                        <group>
+                                            <reason>Base code should not access Jenkins UI elements</reason>
+                                            <basePackage>**</basePackage>
+                                            <bannedImports>
+                                                <bannedImport>com.lectra.ci.ui.**</bannedImport>
+                                            </bannedImports>
+                                        </group>
+                                        <group>
+                                            <reason>Model classes should not access other classes than model ones</reason>
+                                            <basePackage>com.lectra.ci.domain.model.**</basePackage>
+                                            <bannedImports>
+                                                <bannedImport>com.lectra.ci.**</bannedImport>
+                                            </bannedImports>
+                                        </group>
+                                        <group>
+                                            <reason>Service classes should not access rest ones</reason>
+                                            <basePackage>com.lectra.ci.service.**</basePackage>
+                                            <bannedImports>
+                                                <bannedImport>com.lectra.ci.rest.**</bannedImport>
+                                            </bannedImports>
+                                        </group>
+                                    </groups>
+                                </RestrictImports>
+                            </rules>
+                        </configuration>
+
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>${license-maven-plugin.version}</version>
+                <configuration>
+                    <properties>
+                        <owner>LECTRA</owner>
+                        <email>rd.opensource@lectra.com</email>
+                    </properties>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                            <excludes>
+                                <exclude>LICENSE</exclude>
+                                <exclude>**/README</exclude>
+                                <exclude>src/test/resources/**</exclude>
+                                <exclude>src/main/resources/**</exclude>
+                                <exclude>.gitignore</exclude>
+                                <exclude>.dockerignore</exclude>
+                                <exclude>Jenkinsfile</exclude>
+                            </excludes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <jreleaser-maven-plugin.version>1.0.0-M2</jreleaser-maven-plugin.version>
+                <jreleaser.github.owner>lectra-tech</jreleaser.github.owner>
+                <jreleaser.github.name>popcorn-jenkins-plugin</jreleaser.github.name>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <configuration>
+                            <rules>
+                                <requireReleaseDeps>
+                                    <message>No snapshots dependencies allowed</message>
+                                </requireReleaseDeps>
+                            </rules>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jreleaser</groupId>
+                        <artifactId>jreleaser-maven-plugin</artifactId>
+                        <version>${jreleaser-maven-plugin.version}</version>
+                        <configuration>
+                            <jreleaser>
+                                <release>
+                                    <github>
+                                        <owner>${jreleaser.github.owner}</owner>
+                                        <name>${jreleaser.github.name}</name>
+                                        <overwrite>false</overwrite>
+                                        <skipTag>true</skipTag>
+                                        <changelog>
+                                            <formatted>ALWAYS</formatted>
+                                            <preset>conventional-commits</preset>
+                                            <format>- {{commitShortHash}} {{commitTitle}}</format>
+                                            <labelers>
+                                                <labeler>
+                                                    <label>skip</label>
+                                                    <title>build(skip)</title>
+                                                </labeler>
+                                            </labelers>
+                                            <categories>
+                                                <category>
+                                                    <title>Ignore</title>
+                                                    <key>ignore</key>
+                                                    <labels>skip</labels>
+                                                </category>
+                                            </categories>
+                                            <hide>
+                                                <categories>
+                                                    <category>merge</category>
+                                                    <category>ignore</category>
+                                                </categories>
+                                                <contributors>
+                                                    <contributor>GitHub Action Release</contributor>
+                                                </contributors>
+                                            </hide>
+                                        </changelog>
+                                    </github>
+                                </release>
+                                <files>
+                                    <active>ALWAYS</active>
+                                    <artifacts>
+                                        <artifact>
+                                            <path>${project.build.directory}/${project.build.finalName}.hpi</path>
+                                        </artifact>
+                                        <artifact>
+                                            <path>${project.build.directory}/${project.build.finalName}-javadoc.jar</path>
+                                        </artifact>
+                                        <artifact>
+                                            <path>${project.build.directory}/${project.build.finalName}-sources.jar</path>
+                                        </artifact>
+                                    </artifacts>
+                                </files>
+                            </jreleaser>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>lectra</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>lectra-releases</id>
+                    <name>lectra-releases</name>
+                    <url>http://srdspicartifactorypro.eu.lectra.com/artifactory/libs-release-local</url>
+                </repository>
+                <snapshotRepository>
+                    <id>lectra-snapshots</id>
+                    <name>lectra-snapshots</name>
+                    <url>http://srdspicartifactorypro.eu.lectra.com/artifactory/libs-snapshot-local</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>install-hooks</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>!env.CI</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>install-git-hook</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${basedir}/install-hooks.sh</executable>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

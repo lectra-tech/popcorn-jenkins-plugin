@@ -1,0 +1,22 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+		 xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">			
+	<l:layout title="${%page.title}">
+		
+
+    	<l:main-panel>    		     	
+    		<body>
+    				<H1>${%body.title}</H1>
+                    <p>${%lock.feature}</p>
+            	    <f:form descriptor="${it.descriptor}">
+                        <f:validateButton
+                           title="${%lock.link}"
+                           method="lock" />
+                        <f:validateButton
+                           title="${%unlock.link}"
+                           method="unlock" />
+                     </f:form>
+			</body>	      	 
+    	</l:main-panel>		   		
+	</l:layout>
+</j:jelly>
