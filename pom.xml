@@ -29,7 +29,7 @@
     <!-- The Basics -->
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>lectra-popcorn</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>hpi</packaging>
 
     <!-- More Project Information -->
