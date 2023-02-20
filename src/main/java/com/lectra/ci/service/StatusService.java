@@ -16,7 +16,7 @@
 package com.lectra.ci.service;
 
 import com.lectra.ci.domain.model.Metrics;
-import hudson.model.Computer;
+import hudson.model.Job;
 import jenkins.model.Jenkins;
 
 /** Status service gather and expose information on the system. */
@@ -63,9 +63,10 @@ public class StatusService {
    */
   private int computeRunningJobs() {
     int cpt = 0;
-    Computer[] computers = jenkinsInstance.getComputers();
-    for (Computer computer : computers) {
-      cpt += computer.countBusy();
+    for (Job job : jenkinsInstance.getAllItems(Job.class)) {
+      if ( job.isBuilding() ) {
+        cpt++;
+      }
     }
     return cpt;
   }
