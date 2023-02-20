@@ -64,7 +64,7 @@ public class StatusService {
   private int computeRunningJobs() {
     int cpt = 0;
     for (Job job : jenkinsInstance.getAllItems(Job.class)) {
-      if ( job.isBuilding() ) {
+      if (job.isBuilding()) {
         cpt++;
       }
     }
