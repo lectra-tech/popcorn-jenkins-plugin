@@ -38,7 +38,7 @@ In order to fire a release, MAINTAINERS have to update `release` branch onto the
 ```
 git checkout release
 git fetch origin main
-git merge -ff-only origin/main
+git merge --ff-only origin/main
 git push origin release
 ```
 
