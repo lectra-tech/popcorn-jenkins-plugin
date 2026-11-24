@@ -76,7 +76,7 @@
               ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
              -->
         <!-- dependencies -->
-        <cloudbees.folder.version>6.7</cloudbees.folder.version>
+        <cloudbees.folder.version>6.848.ve3b_fd7839a_81</cloudbees.folder.version>
         <configuration.as.code.version>1.35</configuration.as.code.version>
         <httpcore.version>4.4.14</httpcore.version>
 
